@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HealthyLife Community Clinic – Patient Portal</title>
+<meta name="description" content="Book consultations, vaccinations, and telehealth appointments at HealthyLife Community Clinic. Accessible and inclusive booking for all patients.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ── Design tokens ─────────────────────────────────────── */
+  :root{
+    --clr-forest:#1a4f3a;
+    --clr-sage:#3d7a5e;
+    --clr-mint:#b8ddd0;
+    --clr-cream:#f5f2eb;
+    --clr-warm:#fdf8f0;
+    --clr-gold:#c8933a;
+    --clr-red:#c0392b;
+    --clr-text:#1c1c1c;
+    --clr-muted:#4a5568;
+    --clr-border:#ccddd5;
+    --radius:8px;
+    --shadow:0 2px 12px rgba(26,79,58,.12);
+    --focus-ring:0 0 0 3px rgba(61,122,94,.45);
+    --font-display:'DM Serif Display',serif;
+    --font-body:'DM Sans',sans-serif;
+  }
+
+  /* ── Reset & base ──────────────────────────────────────── */
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;font-size:16px}
+  body{font-family:var(--font-body);color:var(--clr-text);background:var(--clr-warm);line-height:1.6}
+  img{max-width:100%;display:block}
+  a{color:var(--clr-sage);text-decoration:underline}
+  a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+    outline:3px solid var(--clr-sage);outline-offset:3px;box-shadow:var(--focus-ring)
+  }
+
+  /* Skip link – keyboard accessibility */
+  .skip-link{position:absolute;left:-999px;top:0;z-index:9999;padding:.5rem 1rem;background:var(--clr-forest);color:#fff;font-weight:600;border-radius:0 0 var(--radius) 0}
+  .skip-link:focus{left:0}
+
+  /* ── Layout helpers ─────────────────────────────────────── */
+  .container{max-width:960px;margin:0 auto;padding:0 1.25rem}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+  /* ── Header / Nav ───────────────────────────────────────── */
+  header{background:var(--clr-forest);color:#fff;padding:0}
+  .header-top{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;max-width:960px;margin:0 auto;gap:1rem}
+  .logo{font-family:var(--font-display);font-size:1.4rem;color:#fff;text-decoration:none;display:flex;align-items:center;gap:.5rem}
+  .logo-icon{width:36px;height:36px;background:var(--clr-mint);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .logo-icon svg{width:20px;height:20px;fill:var(--clr-forest)}
+  .header-actions{display:flex;gap:.5rem;align-items:center}
+  .btn-header{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);padding:.4rem .9rem;border-radius:var(--radius);font-size:.9rem;cursor:pointer;font-family:var(--font-body);transition:background .2s}
+  .btn-header:hover{background:rgba(255,255,255,.28)}
+
+  /* Accessible nav */
+  nav{background:var(--clr-sage)}
+  nav ul{display:flex;list-style:none;max-width:960px;margin:0 auto;padding:0 1.25rem;flex-wrap:wrap}
+  nav li a{display:block;color:#fff;text-decoration:none;padding:.7rem 1rem;font-size:.95rem;transition:background .2s}
+  nav li a:hover,nav li a[aria-current="page"]{background:rgba(0,0,0,.2)}
+  nav li a[aria-current="page"]{font-weight:600;border-bottom:3px solid var(--clr-gold)}
+
+  /* Mobile nav toggle */
+  .nav-toggle{display:none;background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;padding:.5rem}
+
+  /* ── Search bar ─────────────────────────────────────────── */
+  .search-bar{background:var(--clr-cream);border-bottom:1px solid var(--clr-border);padding:.75rem 1.25rem}
+  .search-bar form{display:flex;gap:.5rem;max-width:960px;margin:0 auto}
+  .search-bar input{flex:1;padding:.55rem .85rem;border:1.5px solid var(--clr-border);border-radius:var(--radius);font-family:var(--font-body);font-size:1rem;background:#fff}
+  .search-bar button{padding:.55rem 1.1rem;background:var(--clr-forest);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-family:var(--font-body);font-weight:500}
+  .search-bar button:hover{background:var(--clr-sage)}
+
+  /* ── Hero ───────────────────────────────────────────────── */
+  .hero{background:linear-gradient(135deg,var(--clr-forest) 0%,var(--clr-sage) 100%);color:#fff;padding:3.5rem 1.25rem;text-align:center}
+  .hero h1{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:.75rem;line-height:1.2}
+  .hero p{font-size:1.1rem;opacity:.9;max-width:540px;margin:0 auto 1.5rem}
+  .hero-cta{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+  .btn-primary{background:var(--clr-gold);color:#fff;border:none;padding:.75rem 1.6rem;border-radius:var(--radius);font-size:1rem;font-weight:600;cursor:pointer;font-family:var(--font-body);text-decoration:none;display:inline-block;transition:filter .2s}
+  .btn-primary:hover{filter:brightness(1.1)}
+  .btn-outline{background:transparent;color:#fff;border:2px solid #fff;padding:.7rem 1.5rem;border-radius:var(--radius);font-size:1rem;cursor:pointer;font-family:var(--font-body);text-decoration:none;display:inline-block;transition:background .2s}
+  .btn-outline:hover{background:rgba(255,255,255,.18)}
+
+  /* ── Service cards ──────────────────────────────────────── */
+  .services{padding:2.5rem 0;background:var(--clr-warm)}
+  .services h2{font-family:var(--font-display);font-size:1.8rem;text-align:center;margin-bottom:1.5rem;color:var(--clr-forest)}
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem}
+  .card{background:#fff;border-radius:var(--radius);padding:1.5rem;border:1px solid var(--clr-border);box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s}
+  .card:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(26,79,58,.18)}
+  .card-icon{width:48px;height:48px;background:var(--clr-mint);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:1rem}
+  .card-icon svg{width:24px;height:24px;fill:var(--clr-forest)}
+  .card h3{font-family:var(--font-display);font-size:1.15rem;margin-bottom:.4rem;color:var(--clr-forest)}
+  .card p{font-size:.92rem;color:var(--clr-muted)}
+  .card .btn-book{margin-top:1rem;width:100%;padding:.6rem;background:var(--clr-forest);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-family:var(--font-body);font-weight:500;transition:background .2s}
+  .card .btn-book:hover{background:var(--clr-sage)}
+
+  /* ── Tabs (Login / Register) ─────────────────────────────── */
+  .auth-section{padding:2.5rem 0;background:var(--clr-cream)}
+  .auth-section h2{font-family:var(--font-display);font-size:1.8rem;text-align:center;margin-bottom:1.5rem;color:var(--clr-forest)}
+  .tab-bar{display:flex;border-bottom:2px solid var(--clr-border);max-width:600px;margin:0 auto 1.5rem}
+  .tab-btn{flex:1;background:none;border:none;padding:.75rem;font-family:var(--font-body);font-size:1rem;cursor:pointer;color:var(--clr-muted);border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .2s,border-color .2s}
+  .tab-btn[aria-selected="true"]{color:var(--clr-forest);font-weight:600;border-bottom-color:var(--clr-forest)}
+  .tab-btn:hover{color:var(--clr-forest)}
+  .tab-panel{display:none;max-width:600px;margin:0 auto;background:#fff;border-radius:var(--radius);padding:2rem;box-shadow:var(--shadow);border:1px solid var(--clr-border)}
+  .tab-panel[aria-hidden="false"]{display:block}
+
+  /* ── Form styles ────────────────────────────────────────── */
+  .form-group{margin-bottom:1.2rem}
+  .form-group label{display:block;font-weight:500;margin-bottom:.35rem;color:var(--clr-text)}
+  .form-group .hint{font-size:.82rem;color:var(--clr-muted);margin-bottom:.35rem;display:block}
+  .form-group input,
+  .form-group select,
+  .form-group textarea{width:100%;padding:.65rem .85rem;border:1.5px solid var(--clr-border);border-radius:var(--radius);font-family:var(--font-body);font-size:1rem;background:#fff;transition:border-color .2s}
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus{border-color:var(--clr-sage)}
+  .form-group input[aria-invalid="true"],
+  .form-group select[aria-invalid="true"]{border-color:var(--clr-red)}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+  .error-msg{color:var(--clr-red);font-size:.83rem;margin-top:.3rem;display:none}
+  .error-msg.visible{display:block}
+
+  /* Password strength */
+  .pw-strength{height:6px;border-radius:3px;margin-top:.4rem;background:#e2e8f0;overflow:hidden}
+  .pw-strength-bar{height:100%;width:0;border-radius:3px;transition:width .3s,background .3s}
+  .pw-label{font-size:.8rem;color:var(--clr-muted);margin-top:.25rem}
+
+  /* Consent / checkbox */
+  .check-group{display:flex;gap:.65rem;align-items:flex-start;margin-bottom:.9rem}
+  .check-group input[type="checkbox"]{width:18px;height:18px;margin-top:2px;accent-color:var(--clr-sage);flex-shrink:0;cursor:pointer}
+  .check-group label{font-size:.9rem;color:var(--clr-text);cursor:pointer}
+  .consent-box{background:var(--clr-cream);border:1px solid var(--clr-border);border-radius:var(--radius);padding:1rem;margin-bottom:1rem}
+  .consent-box p{font-size:.88rem;color:var(--clr-muted);margin-bottom:.75rem}
+
+  /* Payment section */
+  .payment-section{background:var(--clr-cream);border:1px solid var(--clr-border);border-radius:var(--radius);padding:1rem;margin-bottom:1rem}
+  .payment-section h4{font-size:1rem;font-weight:600;margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem;color:var(--clr-forest)}
+  .payment-section .lock-icon{font-size:1rem}
+  .security-note{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--clr-sage);margin-top:.5rem}
+
+  .btn-submit{width:100%;padding:.85rem;background:var(--clr-forest);color:#fff;border:none;border-radius:var(--radius);font-family:var(--font-display);font-size:1.05rem;cursor:pointer;transition:background .2s;letter-spacing:.3px}
+  .btn-submit:hover{background:var(--clr-sage)}
+
+  /* Discount badge */
+  .discount-badge{background:linear-gradient(90deg,var(--clr-gold),#e8a93a);color:#fff;padding:.5rem 1rem;border-radius:var(--radius);font-size:.88rem;display:inline-flex;align-items:center;gap:.4rem;margin-bottom:1rem;font-weight:500}
+
+  /* ── Doctor search ──────────────────────────────────────── */
+  .doctor-search{padding:2.5rem 0;background:var(--clr-warm)}
+  .doctor-search h2{font-family:var(--font-display);font-size:1.8rem;text-align:center;margin-bottom:1.5rem;color:var(--clr-forest)}
+  .search-filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;background:#fff;padding:1.25rem;border-radius:var(--radius);border:1px solid var(--clr-border);box-shadow:var(--shadow);margin-bottom:1.5rem}
+  .filter-group label{display:block;font-size:.85rem;font-weight:600;margin-bottom:.35rem;color:var(--clr-forest)}
+  .filter-group select,
+  .filter-group input{width:100%;padding:.55rem .75rem;border:1.5px solid var(--clr-border);border-radius:var(--radius);font-family:var(--font-body);font-size:.95rem}
+  .search-doctors-btn{grid-column:1/-1;padding:.65rem;background:var(--clr-forest);color:#fff;border:none;border-radius:var(--radius);font-family:var(--font-body);font-weight:600;cursor:pointer;transition:background .2s}
+  .search-doctors-btn:hover{background:var(--clr-sage)}
+  .doctor-results{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem}
+  .doctor-card{background:#fff;border-radius:var(--radius);padding:1.25rem;border:1px solid var(--clr-border);box-shadow:var(--shadow)}
+  .doctor-avatar{width:56px;height:56px;border-radius:50%;background:var(--clr-mint);display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;font-family:var(--font-display);font-size:1.4rem;color:var(--clr-forest)}
+  .doctor-card h3{font-size:1.05rem;font-weight:600;color:var(--clr-forest)}
+  .doctor-card p{font-size:.88rem;color:var(--clr-muted);margin:.15rem 0}
+  .doctor-card .avail{font-size:.82rem;color:var(--clr-sage);font-weight:500;margin:.5rem 0}
+  .doctor-card button{width:100%;margin-top:.75rem;padding:.55rem;background:var(--clr-sage);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-family:var(--font-body);transition:background .2s}
+  .doctor-card button:hover{background:var(--clr-forest)}
+
+  /* ── Accessibility bar ──────────────────────────────────── */
+  .a11y-bar{background:var(--clr-forest);color:#fff;padding:.4rem 1.25rem;font-size:.82rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+  .a11y-bar span{opacity:.8}
+  .a11y-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);color:#fff;padding:.25rem .65rem;border-radius:4px;cursor:pointer;font-size:.82rem;font-family:var(--font-body)}
+  .a11y-btn:hover{background:rgba(255,255,255,.3)}
+
+  /* ── Footer ─────────────────────────────────────────────── */
+  footer{background:var(--clr-forest);color:rgba(255,255,255,.8);padding:2rem 1.25rem;margin-top:2rem}
+  .footer-inner{max-width:960px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem}
+  footer h4{font-family:var(--font-display);font-size:1.05rem;color:#fff;margin-bottom:.65rem}
+  footer a{color:rgba(255,255,255,.75);text-decoration:none;display:block;font-size:.9rem;margin-bottom:.3rem}
+  footer a:hover{color:#fff;text-decoration:underline}
+  .footer-bottom{text-align:center;margin-top:1.5rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.15);font-size:.82rem;color:rgba(255,255,255,.55);max-width:960px;margin-left:auto;margin-right:auto}
+
+  /* ── Alert / Notice ─────────────────────────────────────── */
+  .alert{padding:.85rem 1rem;border-radius:var(--radius);margin-bottom:1rem;font-size:.9rem;display:flex;align-items:center;gap:.5rem}
+  .alert-success{background:#d4edda;border:1px solid #c3e6cb;color:#155724}
+  .alert-info{background:#d1ecf1;border:1px solid #bee5eb;color:#0c5460}
+  .alert-error{background:#f8d7da;border:1px solid #f5c6cb;color:#721c24}
+  .hidden{display:none !important}
+
+  /* ── High contrast mode ─────────────────────────────────── */
+  body.high-contrast{filter:none}
+  body.high-contrast,:root.high-contrast{--clr-forest:#000;--clr-sage:#003d22;--clr-mint:#007850;--clr-cream:#fffde7;--clr-warm:#ffffff;--clr-gold:#7b4f00;--clr-text:#000;--clr-border:#000}
+  body.high-contrast .card,
+  body.high-contrast .tab-panel,
+  body.high-contrast .doctor-card{border-width:2px;border-color:#000}
+
+  /* Large text mode */
+  body.large-text{font-size:18px}
+
+  /* ── Responsive ─────────────────────────────────────────── */
+  @media(max-width:640px){
+    .form-row{grid-template-columns:1fr}
+    .header-top{flex-wrap:wrap}
+    nav ul{flex-direction:column}
+    .nav-toggle{display:block}
+    nav ul{display:none}
+    nav ul.open{display:flex}
+    .hero{padding:2rem 1rem}
+    .search-bar form{flex-direction:column}
+  }
+</style>
+</head>
+<body>
+
+<!-- Skip navigation link for keyboard/screen reader users -->
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<!-- Accessibility toolbar -->
+<div class="a11y-bar" role="complementary" aria-label="Accessibility options">
+  <span>Accessibility:</span>
+  <button class="a11y-btn" onclick="toggleHighContrast()" aria-pressed="false" id="hc-btn">High Contrast</button>
+  <button class="a11y-btn" onclick="toggleLargeText()" aria-pressed="false" id="lt-btn">Larger Text</button>
+  <button class="a11y-btn" onclick="document.documentElement.lang='ta'" aria-label="Switch to Tamil">தமிழ்</button>
+  <button class="a11y-btn" onclick="document.documentElement.lang='zh'" aria-label="Switch to Chinese">中文</button>
+</div>
+
+<!-- Header -->
+<header>
+  <div class="header-top">
+    <a class="logo" href="#" aria-label="HealthyLife Community Clinic – home">
+      <div class="logo-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6H9l3-7 3 7h-2v6z"/></svg>
+      </div>
+      HealthyLife Clinic
+    </a>
+    <div class="header-actions">
+      <button class="btn-header" aria-label="Call us: 1800 123 456">📞 1800 123 456</button>
+      <button class="btn-header" onclick="showSection('auth')">My Account</button>
+    </div>
+    <button class="nav-toggle" aria-controls="main-nav" aria-expanded="false" onclick="toggleNav(this)" aria-label="Toggle navigation menu">☰</button>
+  </div>
+</header>
+
+<!-- Navigation -->
+<nav aria-label="Main navigation">
+  <ul id="main-nav" role="list">
+    <li><a href="#" aria-current="page">Home</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#find-doctor">Find a Doctor</a></li>
+    <li><a href="#auth">Book Appointment</a></li>
+    <li><a href="#" aria-label="Open Privacy Policy (PDF)">Privacy Policy</a></li>
+    <li><a href="#">Contact Us</a></li>
+  </ul>
+</nav>
+
+<!-- Search bar -->
+<div class="search-bar" role="search">
+  <form action="#" method="get" aria-label="Site-wide search">
+    <label for="site-search" class="sr-only">Search doctors, services, or FAQs</label>
+    <input type="search" id="site-search" name="q" placeholder="Search doctors, services, or FAQs…" aria-describedby="search-hint">
+    <span id="search-hint" class="sr-only">Type a keyword and press Search</span>
+    <button type="submit">Search</button>
+  </form>
+</div>
+
+<!-- ── MAIN CONTENT ────────────────────────────────────────── -->
+<main id="main-content">
+
+  <!-- Hero -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <h1 id="hero-heading">Your Health, Our Priority</h1>
+    <p>Book consultations, vaccinations, and telehealth appointments — designed for everyone, including elderly patients and people with disabilities.</p>
+    <div class="hero-cta">
+      <a href="#auth" class="btn-primary">Register / Book Now</a>
+      <a href="#find-doctor" class="btn-outline">Find a Doctor</a>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="services" id="services" aria-labelledby="services-heading">
+    <div class="container">
+      <h2 id="services-heading">Our Services</h2>
+      <div class="card-grid" role="list">
+
+        <article class="card" role="listitem">
+          <div class="card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 1 0 0 10A5 5 0 0 0 12 2zm0 12c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4z"/></svg>
+          </div>
+          <h3>General Consultation</h3>
+          <p>Meet with our experienced GPs for health check-ups, referrals, and ongoing care.</p>
+          <button class="btn-book" onclick="document.getElementById('register-tab').click()">Book Now</button>
+        </article>
+
+        <article class="card" role="listitem">
+          <div class="card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M9.5 11l1.5 4.5 3-9 1.5 4.5H19V9H5v2h4.5zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+          </div>
+          <h3>Vaccination Bookings</h3>
+          <p>Schedule flu shots, COVID boosters, travel vaccines, and routine immunisations.</p>
+          <button class="btn-book" onclick="document.getElementById('register-tab').click()">Book Now</button>
+        </article>
+
+        <article class="card" role="listitem">
+          <div class="card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+          </div>
+          <h3>Telehealth Appointments</h3>
+          <p>See a doctor from home via secure video call. 3+ sessions earn a 10% discount.</p>
+          <div class="discount-badge" aria-label="Discount available">🎉 10% off – book 3+ sessions</div>
+          <button class="btn-book" onclick="document.getElementById('register-tab').click()">Book Now</button>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Doctor Search -->
+  <section class="doctor-search" id="find-doctor" aria-labelledby="doctor-heading">
+    <div class="container">
+      <h2 id="doctor-heading">Find a Doctor</h2>
+
+      <div class="search-filters" role="search" aria-label="Doctor search filters">
+        <div class="filter-group">
+          <label for="filter-date">Preferred Date</label>
+          <input type="date" id="filter-date" name="date" min="">
+        </div>
+        <div class="filter-group">
+          <label for="filter-specialty">Specialty</label>
+          <select id="filter-specialty" name="specialty">
+            <option value="">All Specialties</option>
+            <option>General Practice</option>
+            <option>Paediatrics</option>
+            <option>Geriatrics</option>
+            <option>Mental Health</option>
+            <option>Immunisation</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filter-service">Service Type</label>
+          <select id="filter-service" name="service">
+            <option value="">All Services</option>
+            <option>Consultation</option>
+            <option>Vaccination</option>
+            <option>Telehealth</option>
+          </select>
+        </div>
+        <button class="search-doctors-btn" onclick="showDoctors()" aria-label="Search for available doctors">Search Doctors</button>
+      </div>
+
+      <div id="doctor-results" class="doctor-results" aria-live="polite" aria-label="Doctor search results"></div>
+    </div>
+  </section>
+
+  <!-- Auth Section (Login / Register) -->
+  <section class="auth-section" id="auth" aria-labelledby="auth-heading">
+    <div class="container">
+      <h2 id="auth-heading">Patient Portal</h2>
+
+      <div class="tab-bar" role="tablist" aria-label="Login or Register">
+        <button class="tab-btn" role="tab" aria-selected="true" aria-controls="login-panel" id="login-tab" onclick="switchTab('login')">Log In</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="register-panel" id="register-tab" onclick="switchTab('register')">Register</button>
+      </div>
+
+      <!-- Login Panel -->
+      <div class="tab-panel" role="tabpanel" id="login-panel" aria-hidden="false" aria-labelledby="login-tab">
+        <div id="login-success" class="alert alert-success hidden" role="alert" aria-live="assertive">
+          ✅ Logged in successfully. Welcome back!
+        </div>
+        <form novalidate onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="login-email">Email Address <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+            <input type="email" id="login-email" name="email" autocomplete="email" required aria-required="true" placeholder="you@example.com">
+            <span class="error-msg" id="login-email-err" role="alert">Please enter a valid email address.</span>
+          </div>
+          <div class="form-group">
+            <label for="login-pw">Password <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+            <input type="password" id="login-pw" name="password" autocomplete="current-password" required aria-required="true">
+            <span class="error-msg" id="login-pw-err" role="alert">Please enter your password.</span>
+          </div>
+          <div class="form-group">
+            <label for="security-q">Security Question</label>
+            <select id="security-q" name="security_question" aria-describedby="sq-hint">
+              <option value="">-- Select a question --</option>
+              <option>What is your mother's maiden name?</option>
+              <option>What was the name of your first pet?</option>
+              <option>What city were you born in?</option>
+            </select>
+            <span id="sq-hint" class="hint">Required if you forgot your password</span>
+          </div>
+          <div class="form-group">
+            <label for="security-ans">Security Answer</label>
+            <input type="text" id="security-ans" name="security_answer" autocomplete="off">
+          </div>
+          <button type="submit" class="btn-submit">Log In</button>
+        </form>
+        <p style="text-align:center;margin-top:1rem;font-size:.9rem">
+          New patient? <button class="btn-header" style="color:var(--clr-sage);background:none;border:none;padding:0;cursor:pointer;text-decoration:underline;font-size:.9rem" onclick="switchTab('register')">Register here</button>
+        </p>
+      </div>
+
+      <!-- Register Panel -->
+      <div class="tab-panel" role="tabpanel" id="register-panel" aria-hidden="true" aria-labelledby="register-tab">
+        <div id="register-success" class="alert alert-success hidden" role="alert" aria-live="assertive">
+          ✅ Registration successful! Check your email to verify your account.
+        </div>
+
+        <div class="alert alert-info" role="note">
+          <span aria-hidden="true">ℹ️</span> A one-time joining fee of <strong>$10.00 AUD</strong> applies to new registrations.
+        </div>
+
+        <form novalidate onsubmit="handleRegister(event)" aria-label="New patient registration form">
+
+          <fieldset style="border:none;padding:0;margin:0 0 1.2rem">
+            <legend style="font-weight:600;font-size:1rem;color:var(--clr-forest);margin-bottom:.75rem">Personal Details</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="r-first">First Name <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                <input type="text" id="r-first" name="first_name" autocomplete="given-name" required aria-required="true">
+                <span class="error-msg" id="r-first-err" role="alert">First name is required.</span>
+              </div>
+              <div class="form-group">
+                <label for="r-last">Last Name <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                <input type="text" id="r-last" name="last_name" autocomplete="family-name" required aria-required="true">
+                <span class="error-msg" id="r-last-err" role="alert">Last name is required.</span>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="r-dob">Date of Birth <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                <input type="date" id="r-dob" name="dob" autocomplete="bday" required aria-required="true">
+                <span class="error-msg" id="r-dob-err" role="alert">Date of birth is required.</span>
+              </div>
+              <div class="form-group">
+                <label for="r-phone">Phone Number <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                <input type="tel" id="r-phone" name="phone" autocomplete="tel" required aria-required="true" placeholder="04xx xxx xxx">
+                <span class="error-msg" id="r-phone-err" role="alert">A valid phone number is required.</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="r-email">Email Address <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+              <input type="email" id="r-email" name="email" autocomplete="email" required aria-required="true" placeholder="you@example.com">
+              <span class="error-msg" id="r-email-err" role="alert">Please enter a valid email address.</span>
+            </div>
+          </fieldset>
+
+          <fieldset style="border:none;padding:0;margin:0 0 1.2rem">
+            <legend style="font-weight:600;font-size:1rem;color:var(--clr-forest);margin-bottom:.75rem">Emergency Contact</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="r-ec-name">Contact Name <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                <input type="text" id="r-ec-name" name="emergency_name" required aria-required="true">
+                <span class="error-msg" id="r-ec-name-err" role="alert">Emergency contact name is required.</span>
+              </div>
+              <div class="form-group">
+                <label for="r-ec-phone">Contact Phone <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                <input type="tel" id="r-ec-phone" name="emergency_phone" required aria-required="true">
+                <span class="error-msg" id="r-ec-phone-err" role="alert">Emergency contact phone is required.</span>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset style="border:none;padding:0;margin:0 0 1.2rem">
+            <legend style="font-weight:600;font-size:1rem;color:var(--clr-forest);margin-bottom:.75rem">Account Security</legend>
+            <div class="form-group">
+              <label for="r-pw">Create Password <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+              <span class="hint" id="pw-rules">Must be at least 8 characters, including a number and a symbol (e.g. ! @ # $).</span>
+              <input type="password" id="r-pw" name="password" autocomplete="new-password" required aria-required="true" aria-describedby="pw-rules pw-strength-label" oninput="updateStrength(this.value)">
+              <div class="pw-strength" aria-hidden="true"><div class="pw-strength-bar" id="pw-bar"></div></div>
+              <div class="pw-label" id="pw-strength-label" aria-live="polite"></div>
+              <span class="error-msg" id="r-pw-err" role="alert">Password must be at least 8 characters with a number and symbol.</span>
+            </div>
+            <div class="form-group">
+              <label for="r-pw2">Confirm Password <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+              <input type="password" id="r-pw2" name="password2" autocomplete="new-password" required aria-required="true">
+              <span class="error-msg" id="r-pw2-err" role="alert">Passwords do not match.</span>
+            </div>
+            <div class="form-group">
+              <label for="r-sq">Security Question <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+              <select id="r-sq" name="security_question" required aria-required="true">
+                <option value="">-- Select a question --</option>
+                <option>What is your mother's maiden name?</option>
+                <option>What was the name of your first pet?</option>
+                <option>What city were you born in?</option>
+                <option>What was the name of your primary school?</option>
+              </select>
+              <span class="error-msg" id="r-sq-err" role="alert">Please select a security question.</span>
+            </div>
+            <div class="form-group">
+              <label for="r-sa">Security Answer <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+              <input type="text" id="r-sa" name="security_answer" required aria-required="true" autocomplete="off">
+              <span class="error-msg" id="r-sa-err" role="alert">Please provide an answer to your security question.</span>
+            </div>
+          </fieldset>
+
+          <!-- Payment -->
+          <div class="payment-section" aria-labelledby="payment-heading">
+            <h4 id="payment-heading"><span class="lock-icon" aria-hidden="true">🔒</span> Secure Payment – Joining Fee ($10.00 AUD)</h4>
+            <div class="form-group">
+              <label for="r-cc-name">Cardholder Name <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+              <input type="text" id="r-cc-name" name="cc_name" autocomplete="cc-name" required aria-required="true" placeholder="As it appears on card">
+              <span class="error-msg" id="r-cc-name-err" role="alert">Cardholder name is required.</span>
+            </div>
+            <div class="form-group">
+              <label for="r-cc-num">Card Number <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+              <input type="text" id="r-cc-num" name="cc_number" autocomplete="cc-number" required aria-required="true" placeholder="•••• •••• •••• ••••" maxlength="19" oninput="formatCard(this)">
+              <span class="error-msg" id="r-cc-num-err" role="alert">Please enter a valid 16-digit card number.</span>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="r-cc-exp">Expiry Date <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                <input type="text" id="r-cc-exp" name="cc_expiry" autocomplete="cc-exp" placeholder="MM / YY" maxlength="7" required aria-required="true">
+                <span class="error-msg" id="r-cc-exp-err" role="alert">Please enter a valid expiry date.</span>
+              </div>
+              <div class="form-group">
+                <label for="r-cc-cvv">CVV <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                <input type="text" id="r-cc-cvv" name="cc_cvv" autocomplete="cc-csc" placeholder="•••" maxlength="4" required aria-required="true" aria-describedby="cvv-hint">
+                <span id="cvv-hint" class="hint">3-4 digits on back of card</span>
+                <span class="error-msg" id="r-cc-cvv-err" role="alert">Please enter a valid CVV.</span>
+              </div>
+            </div>
+            <div class="security-note" aria-label="Security notice">
+              <span aria-hidden="true">🔐</span> Payments are encrypted with TLS 1.3. We do not store full card details.
+            </div>
+          </div>
+
+          <!-- Consent & Opt-ins -->
+          <div class="consent-box" aria-labelledby="consent-heading">
+            <p id="consent-heading" style="font-weight:600;color:var(--clr-forest);margin-bottom:.5rem">Privacy &amp; Consent</p>
+            <p>Your personal information is collected solely to manage your healthcare appointments and is protected under the Australian Privacy Act 1988. It will not be sold or shared with third parties without your explicit consent.</p>
+
+            <div class="check-group">
+              <input type="checkbox" id="consent-store" name="consent_store" required aria-required="true">
+              <label for="consent-store">I consent to HealthyLife Clinic securely storing my personal and health details for appointment management. <span style="color:var(--clr-red)" aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+            </div>
+            <span class="error-msg" id="consent-store-err" role="alert">You must consent to data storage to register.</span>
+
+            <div class="check-group">
+              <input type="checkbox" id="consent-tips" name="consent_tips">
+              <label for="consent-tips">I would like to receive optional health tips and appointment reminders by email or SMS. <em>(optional)</em></label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit" aria-describedby="submit-note">Register &amp; Pay $10.00</button>
+          <p id="submit-note" style="font-size:.8rem;color:var(--clr-muted);text-align:center;margin-top:.5rem">By registering, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <h4>HealthyLife Clinic</h4>
+      <p style="font-size:.88rem;margin-bottom:.5rem">Providing compassionate, accessible healthcare to our community since 2010.</p>
+      <p style="font-size:.82rem">📍 123 Wellness Ave, Sydney NSW 2000</p>
+    </div>
+    <div>
+      <h4>Quick Links</h4>
+      <a href="#services">Our Services</a>
+      <a href="#find-doctor">Find a Doctor</a>
+      <a href="#auth">Patient Portal</a>
+      <a href="#">FAQs</a>
+    </div>
+    <div>
+      <h4>Legal &amp; Privacy</h4>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Accessibility Statement</a>
+      <a href="#">Data Protection</a>
+    </div>
+  </div>
+  <p class="footer-bottom">© 2025 HealthyLife Community Clinic. All rights reserved. This prototype is for educational purposes (ICT211 Assignment 2).</p>
+</footer>
+
+<script>
+/* ── Tab switching ──────────────────────────────────────── */
+function switchTab(tab){
+  const login = document.getElementById('login-tab');
+  const reg   = document.getElementById('register-tab');
+  const lp    = document.getElementById('login-panel');
+  const rp    = document.getElementById('register-panel');
+  if(tab==='login'){
+    login.setAttribute('aria-selected','true');
+    reg.setAttribute('aria-selected','false');
+    lp.setAttribute('aria-hidden','false');
+    rp.setAttribute('aria-hidden','true');
+    login.focus();
+  } else {
+    reg.setAttribute('aria-selected','true');
+    login.setAttribute('aria-selected','false');
+    rp.setAttribute('aria-hidden','false');
+    lp.setAttribute('aria-hidden','true');
+    reg.focus();
+  }
+}
+
+/* ── Mobile nav ─────────────────────────────────────────── */
+function toggleNav(btn){
+  const nav = document.getElementById('main-nav');
+  const open = nav.classList.toggle('open');
+  btn.setAttribute('aria-expanded', open.toString());
+}
+
+/* ── Password strength ──────────────────────────────────── */
+function updateStrength(val){
+  const bar = document.getElementById('pw-bar');
+  const lbl = document.getElementById('pw-strength-label');
+  let score = 0;
+  if(val.length >= 8) score++;
+  if(/[0-9]/.test(val)) score++;
+  if(/[^a-zA-Z0-9]/.test(val)) score++;
+  if(val.length >= 12) score++;
+  const map = {0:['0%','#e2e8f0',''],1:['30%','#e53e3e','Weak'],2:['55%','#dd6b20','Fair'],3:['80%','#d69e2e','Good'],4:['100%','#38a169','Strong']};
+  bar.style.width = map[score][0];
+  bar.style.background = map[score][1];
+  lbl.textContent = map[score][2] ? 'Password strength: ' + map[score][2] : '';
+}
+
+/* ── Card number formatting ─────────────────────────────── */
+function formatCard(el){
+  let v = el.value.replace(/\D/g,'').substring(0,16);
+  el.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+
+/* ── Login handler ──────────────────────────────────────── */
+function handleLogin(e){
+  e.preventDefault();
+  let valid = true;
+  const email = document.getElementById('login-email');
+  const pw    = document.getElementById('login-pw');
+  const emailErr = document.getElementById('login-email-err');
+  const pwErr    = document.getElementById('login-pw-err');
+  if(!email.value || !/^[^@]+@[^@]+\.[^@]+$/.test(email.value)){
+    email.setAttribute('aria-invalid','true');
+    emailErr.classList.add('visible'); valid = false;
+  } else { email.setAttribute('aria-invalid','false'); emailErr.classList.remove('visible'); }
+  if(!pw.value){
+    pw.setAttribute('aria-invalid','true');
+    pwErr.classList.add('visible'); valid = false;
+  } else { pw.setAttribute('aria-invalid','false'); pwErr.classList.remove('visible'); }
+  if(valid){
+    document.getElementById('login-success').classList.remove('hidden');
+    e.target.reset();
+  }
+}
+
+/* ── Register handler ───────────────────────────────────── */
+function handleRegister(e){
+  e.preventDefault();
+  let valid = true;
+  function check(id, errId, test){
+    const el = document.getElementById(id);
+    const er = document.getElementById(errId);
+    if(!test(el)){
+      el.setAttribute('aria-invalid','true');
+      er.classList.add('visible'); valid = false;
+    } else {
+      el.setAttribute('aria-invalid','false');
+      er.classList.remove('visible');
+    }
+  }
+  const notEmpty = el => el.value.trim() !== '';
+  const validEmail = el => /^[^@]+@[^@]+\.[^@]+$/.test(el.value);
+  const validPw = el => el.value.length >= 8 && /[0-9]/.test(el.value) && /[^a-zA-Z0-9]/.test(el.value);
+  const pwMatch = el => el.value === document.getElementById('r-pw').value;
+  const validCard = el => el.value.replace(/\s/g,'').length === 16;
+  const validCvv = el => /^\d{3,4}$/.test(el.value);
+
+  check('r-first','r-first-err', notEmpty);
+  check('r-last','r-last-err', notEmpty);
+  check('r-dob','r-dob-err', notEmpty);
+  check('r-phone','r-phone-err', notEmpty);
+  check('r-email','r-email-err', validEmail);
+  check('r-ec-name','r-ec-name-err', notEmpty);
+  check('r-ec-phone','r-ec-phone-err', notEmpty);
+  check('r-pw','r-pw-err', validPw);
+  check('r-pw2','r-pw2-err', pwMatch);
+  check('r-sq','r-sq-err', notEmpty);
+  check('r-sa','r-sa-err', notEmpty);
+  check('r-cc-name','r-cc-name-err', notEmpty);
+  check('r-cc-num','r-cc-num-err', validCard);
+  check('r-cc-exp','r-cc-exp-err', notEmpty);
+  check('r-cc-cvv','r-cc-cvv-err', validCvv);
+
+  const consentEl = document.getElementById('consent-store');
+  const consentErr = document.getElementById('consent-store-err');
+  if(!consentEl.checked){ consentErr.classList.add('visible'); valid = false; }
+  else consentErr.classList.remove('visible');
+
+  if(valid){
+    document.getElementById('register-success').classList.remove('hidden');
+    document.getElementById('register-success').scrollIntoView({behavior:'smooth',block:'center'});
+    e.target.reset();
+    updateStrength('');
+  } else {
+    const firstErr = document.querySelector('[aria-invalid="true"]');
+    if(firstErr) firstErr.focus();
+  }
+}
+
+/* ── Doctor search ──────────────────────────────────────── */
+const doctors = [
+  {name:'Dr. Amara Patel', specialty:'General Practice', service:'Consultation, Telehealth', avail:'Available Mon–Fri', initials:'AP'},
+  {name:'Dr. James Nguyen', specialty:'Geriatrics', service:'Consultation', avail:'Available Tue, Thu', initials:'JN'},
+  {name:'Dr. Sarah Kim', specialty:'Immunisation', service:'Vaccination', avail:'Available Wed, Fri', initials:'SK'},
+  {name:'Dr. Lena Osei', specialty:'Mental Health', service:'Telehealth', avail:'Available Mon, Wed, Fri', initials:'LO'},
+  {name:'Dr. Rafael Torres', specialty:'Paediatrics', service:'Consultation, Vaccination', avail:'Available Mon–Thu', initials:'RT'},
+];
+function showDoctors(){
+  const container = document.getElementById('doctor-results');
+  const service = document.getElementById('filter-service').value.toLowerCase();
+  const specialty = document.getElementById('filter-specialty').value.toLowerCase();
+  const filtered = doctors.filter(d => {
+    const matchS = !service || d.service.toLowerCase().includes(service);
+    const matchSp = !specialty || d.specialty.toLowerCase().includes(specialty);
+    return matchS && matchSp;
+  });
+  if(filtered.length === 0){
+    container.innerHTML = '<p role="status">No doctors found matching your criteria. Please adjust your filters.</p>';
+    return;
+  }
+  container.innerHTML = filtered.map(d => `
+    <article class="doctor-card">
+      <div class="doctor-avatar" aria-hidden="true">${d.initials}</div>
+      <h3>${d.name}</h3>
+      <p>${d.specialty}</p>
+      <p style="font-size:.82rem">${d.service}</p>
+      <p class="avail">✅ ${d.avail}</p>
+      <button onclick="switchTab('register');document.getElementById('auth').scrollIntoView({behavior:'smooth'})">Book Appointment</button>
+    </article>
+  `).join('');
+}
+
+/* ── Accessibility toggles ──────────────────────────────── */
+function toggleHighContrast(){
+  const on = document.body.classList.toggle('high-contrast');
+  const btn = document.getElementById('hc-btn');
+  btn.setAttribute('aria-pressed', on.toString());
+  btn.style.background = on ? 'rgba(255,255,255,.5)' : '';
+}
+function toggleLargeText(){
+  const on = document.body.classList.toggle('large-text');
+  const btn = document.getElementById('lt-btn');
+  btn.setAttribute('aria-pressed', on.toString());
+  btn.style.background = on ? 'rgba(255,255,255,.5)' : '';
+}
+
+/* ── Scroll to section ──────────────────────────────────── */
+function showSection(id){ document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
+
+/* ── Set min date for calendar ───────────────────────────── */
+document.getElementById('filter-date').min = new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>
